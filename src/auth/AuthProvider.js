@@ -21,11 +21,20 @@ export default function AuthProvider( { children } ) {
 
     const logout = () => setUser(null);
 
+    const updateUser = (data) => {
+      setUser ({
+        ...user,
+        ...data
+      })
+    }
+    
+
     const isLogged = () => !!user;
     const hasRole = (role) => user?.role === role; 
 
     const contextValue = {
         user,
+        updateUser,
         isLogged,
         hasRole,
         login,

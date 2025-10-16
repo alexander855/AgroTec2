@@ -1,14 +1,23 @@
 import { useEffect } from 'react'
 import { Modal, Form, Button, Alert } from 'react-bootstrap'
 import {useForm} from 'react-hook-form'
-import ChangePasswordResolver from '../../../validations/ChangePasswordResolver';
+import editAccountResolver from '../../../validations/editAccountResolver';
+import roles from '../../../helpers/roles';
+import useAuth from '../../../auth/useAuth';
+
+
 
 export default function EditModal({ isOpen, close, user}) {
-    const { register, handleSubmit, formState: {errors}, reset } = useForm({ resolver: ChangePasswordResolver});
+    const { register, handleSubmit, formState: {errors, dirtyFields}, reset } = useForm({ resolver: editAccountResolver});
+    const { updateUser, hasRole } = useAuth()
+
+
+    const isDirty = !!Object.keys(dirtyFields).length;
 
     const onSubmit = (formData) => {
-        alert ("Cambiando contraseña")
-        
+        if(!isDirty) return;
+        updateUser(formData)
+        close() 
     }
 
     useEffect(() => {
@@ -67,11 +76,12 @@ export default function EditModal({ isOpen, close, user}) {
                         <Form.Label>Rol</Form.Label>
                         <Form.Control
                             as="select"
+                            disabled={!hasRole('admin')}
                             {...register("role")}
                         >
-                            <option>regular</option>
-                            <option>admin</option>
-
+                            {Object.keys(roles).map(role => (
+                                <option key={role}>{role}</option>
+                            ))}
                         </Form.Control>
                         {errors?.role && (
                             <Form.Text>
@@ -87,7 +97,9 @@ export default function EditModal({ isOpen, close, user}) {
             </Modal.Body>
             <Modal.Footer>
                 <Button variant='secondary' onClick={close} >Cancelar</Button>
-                <Button variant='primary' onClick={handleSubmit(onSubmit)}>Actualizar mi cuenta</Button>
+                <Button variant='primary' onClick={handleSubmit(onSubmit)}
+                   disabled={!isDirty}
+                >Actualizar mi cuenta</Button>
             </Modal.Footer>
         </Modal>
     );

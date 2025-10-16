@@ -16,7 +16,7 @@ export default function ChangePasswordModal({ isOpen, close }) {
             reset ()
         }
 
-    }, [isOpen])
+    }, [isOpen, reset])
     
     return (
         <Modal show={isOpen} onHide={close}>
